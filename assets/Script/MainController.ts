@@ -9,9 +9,14 @@
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const { ccclass, property } = cc._decorator
-
+import Config from "./Config"
 @ccclass
 export default class MainController extends cc.Component {
+  /* 分数*/
+  mScore: Number = 0
+  /* 收回小球数 */
+  recycleBallsCount: Number = 1
+  /* 置障碍物基准率*/
   onLoad() {
     cc.game.setFrameRate(60)
     cc.debug.setDisplayStats(false)
@@ -44,5 +49,24 @@ export default class MainController extends cc.Component {
     cc.PhysicsManager.VELOCITY_ITERATIONS = 10
     cc.PhysicsManager.POSITION_ITERATIONS = 10
   }
-  start() {}
+  start() {
+    /*事件监听*/
+    this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
+    this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
+    /* 显示游戏指引 */
+
+  }
+  init() {
+
+  }
+  onTouchStart() {
+
+
+
+
+  }
+  onTouchEnd() {
+
+  }
+
 }
