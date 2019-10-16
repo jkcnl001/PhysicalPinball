@@ -12,11 +12,12 @@ const { ccclass, property } = cc._decorator
 import Config from "./Config"
 import Ball from "./Ball"
 import Barrier from "./Barrier"
+import Shake from "./Shake"
 @ccclass
 export default class MainController extends cc.Component {
     /**障碍物 */
     @property(cc.Prefab)
-    prefabBarriers: cc.Prefab = null
+    prefabBarriers: cc.Prefab[] = []
     barriers: Barrier[] = []
 
     @property(cc.Prefab)
@@ -102,11 +103,6 @@ export default class MainController extends cc.Component {
         this.guide.active = false;
         this.takeAim["main"] = this;
     }
-    //设置障碍物自身分数值
-    setBarrierScore() {
-        let score = Math.floor(this.randomNum(1 + 2 * this.barrierScoreRate, 5 + 3 * this.barrierScoreRate));
-        return score;
-    }
     onTouchStart(event: cc.Event.EventTouch) {
         this.guideHide();
     }
@@ -171,7 +167,7 @@ export default class MainController extends cc.Component {
                     cc.moveBy(0.5, cc.v2(0, 100)),
                     cc.callFunc(function () {
                         if (barrier.node.position.y > 200) {
-                            barrier.node.runAction(cc.shake(1.5, 3, 3));
+                            barrier.node.runAction(new Shake(1.5, 3, 3));
                         }
                         if (barrier.node.position.y > 300) {
                             this.gameOver();
@@ -206,7 +202,7 @@ export default class MainController extends cc.Component {
     }
     /*抖动障碍物*/
     shake(barrier) {
-        let shake = cc.shake(0.7, 1, 1);
+        let shake = new Shake(0.7, 1, 1);
         barrier.node.runAction(shake);
     }
     /**记分牌显示 */
@@ -215,6 +211,52 @@ export default class MainController extends cc.Component {
         this.lbScoreCount.string = '分数：' + this.score.toString();
     }
 
-    /**设置 */
-
+    /**设置 障碍物自身分数值*/
+    setBarrierScore() {
+        let score = Math.floor(this.randomNum(1 + 2 * this.barrierScoreRate, 5 + 3 * this.barrierScoreRate));
+        return score;
+    }
+    /**消除障碍物 */
+    removeBarrier(barrier) {
+        let idx = this.barriers.indexOf(barrier);
+        if (idx != -1) {
+            barrier.node.removeFromParent(false);
+            this.barriers.splice(idx, 1);
+        }
+    }
+    /** 获取随机距离，用于生成障碍物的间距 */
+    getRandomSpace() {
+        return 80 + Math.random() * 200;
+    }
+    /**获取区间随机值 */
+    randomNum(Min: number, Max: number) {
+        let Range: number = Max - Min;
+        let Rand = Math.random();
+        let num = Min + Math.floor(Rand * Range);
+        return num;
+    }
+    /** 显示引导动画 */
+    guideShow() {
+        this.guide.active = true;
+        let handMove: cc.Node = this.guide.getChildByName('handMove');
+        let animCtrl: cc.Animation = handMove.getComponent(cc.Animation);
+        animCtrl.play('handMove');
+    }
+    /**关闭引导动画 */
+    guideHide() {
+        this.guide.active = false;
+        let handMove = this.guide.getChildByName('handMove');
+        let animCtrl = handMove.getComponent(cc.Animation);
+        animCtrl.stop('handMove');
+    }
+    /**开始游戏 */
+    gameStart() {
+        cc.director.loadScene("game");
+    }
+    /**游戏结束 */
+    gameOver() {
+        this.gameStatus = false;
+        this.gameOverMark.active = true;
+        this.gameOverMark.getChildByName("score").getComponent(cc.Label).string = "得分：" + this.score.toString();
+    }
 }
