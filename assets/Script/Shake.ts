@@ -10,7 +10,6 @@
 
 const { ccclass, property } = cc._decorator;
 
-@ccclass
 export default class Shake extends cc.ActionInterval {
     _initial_x: number = 0
     _initial_y: number = 0

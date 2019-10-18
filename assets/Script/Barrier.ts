@@ -15,6 +15,7 @@ export default class Barrier extends cc.Component {
 
     @property(cc.Label)
     lbScore: cc.Label = null
+    @property(cc.Boolean)
     isAddBuffBall: Boolean = false
     score: number = 0
     main: MainController = null
