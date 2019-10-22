@@ -21,7 +21,7 @@ export default class Barrier extends cc.Component {
     main: MainController = null
     start() {
         if (this.lbScore) {
-            this.lbScore.node.rotation = -this.node.rotation
+            this.lbScore.node.angle = -this.node.angle
         }
         this.setScore(this.main.setBarrierScore());
         this.node.color = cc.color(200, this.randomNum(0, 255), this.randomNum(0, 255), 255)

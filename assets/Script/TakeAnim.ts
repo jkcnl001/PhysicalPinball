@@ -51,6 +51,6 @@ export default class TakeAnim extends cc.Component {
 
         var dis = origin.sub(touchPos)
         var angle = Math.atan2(dis.y, dis.x) / Math.PI * 180;
-        this.arraw.node.rotation = -angle;
+        this.arraw.node.angle = angle;
     }
 }

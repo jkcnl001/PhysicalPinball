@@ -18,11 +18,16 @@ export default class MainController extends cc.Component {
     /**障碍物 */
     @property(cc.Prefab)
     prefabBarriers: cc.Prefab[] = []
+
+    @property(Barrier)
     barriers: Barrier[] = []
+
+
 
     @property(cc.Prefab)
     prefabBall: cc.Prefab = null
-    balls: Ball[] = null
+    @property(cc.Node)
+    balls: Ball[] = []
 
     @property(cc.Label)
     lbScoreCount: cc.Label = null
@@ -32,13 +37,15 @@ export default class MainController extends cc.Component {
     /**开局指引 节点 */
     @property(cc.Node)
     guide: cc.Node = null
-
+    @property(cc.Boolean)
     gameStatus: Boolean = true
 
     /**游戏结束 节点 */
+    @property(cc.Node)
     gameOverMark: cc.Node = null
 
     /**瞄准线 */
+    @property(cc.Node)
     takeAim: cc.Node = null
 
 
@@ -63,10 +70,12 @@ export default class MainController extends cc.Component {
         physicsManager.gravity = cc.v2(0, -cc.PhysicsManager.PTM_RATIO * 9.8 * 4)
 
         /*绘制物理调试信息*/
+        /*
         physicsManager.debugDrawFlags =
             cc.PhysicsManager.DrawBits.e_aabbBit |
             cc.PhysicsManager.DrawBits.e_jointBit |
             cc.PhysicsManager.DrawBits.e_shapeBit
+        */
 
         /*
             设置物理步长
@@ -75,13 +84,15 @@ export default class MainController extends cc.Component {
             每次更新物理系统处理速度的迭代次数，默认 VELOCITY_ITERATIONS  10
             每次更新物理系统处理位置的迭代次数，默认 POSITION_ITERATIONS 10
         */
+        /*
         physicsManager.enabledAccumulator = true
         cc.PhysicsManager.FIXED_TIME_STEP = 1 / 60
         cc.PhysicsManager.VELOCITY_ITERATIONS = 10
         cc.PhysicsManager.POSITION_ITERATIONS = 10
+        */
         this.init()
         this.guideShow()
-        this.addBarriers();
+        this.addBarriers()
     }
     start() {
         /*事件监听*/
@@ -96,7 +107,8 @@ export default class MainController extends cc.Component {
         this.recycleBallsCount = 1;
         this.barrierScoreRate = 0;
         this.balls[0]["main"] = this;
-        this.balls[0].node.group = Config.groupBallInRecycle;
+        cc.log(this.balls[0]["group"])
+        this.balls[0]["group"] = Config.groupBallInRecycle;
         this.gameOverMark.active = false;
         this.gameOverMark.zIndex = 10;
         this.guide.zIndex = 10;
@@ -193,7 +205,7 @@ export default class MainController extends cc.Component {
             barrier.node.parent = this.node;
             barrier.node.position = cc.v2(currentPosX, -410);
             if (barrier.lbScore) {
-                barrier.node.rotation = Math.random() * 360;
+                barrier.node.angle = -Math.random() * 360;
             }
             barrier.main = this;
             currentPosX += this.getRandomSpace();
@@ -244,10 +256,10 @@ export default class MainController extends cc.Component {
     }
     /**关闭引导动画 */
     guideHide() {
-        this.guide.active = false;
         let handMove = this.guide.getChildByName('handMove');
         let animCtrl = handMove.getComponent(cc.Animation);
         animCtrl.stop('handMove');
+        this.guide.active = false;
     }
     /**开始游戏 */
     gameStart() {
@@ -255,8 +267,9 @@ export default class MainController extends cc.Component {
     }
     /**游戏结束 */
     gameOver() {
+        this.gameOverMark.getChildByName("score").getComponent(cc.Label).string = "得分：" + this.score.toString();
         this.gameStatus = false;
         this.gameOverMark.active = true;
-        this.gameOverMark.getChildByName("score").getComponent(cc.Label).string = "得分：" + this.score.toString();
     }
+
 }
